@@ -6,6 +6,19 @@ import (
 	"time"
 )
 
+// newWithClock builds a Supervisor with a custom clock for deterministic
+// backoff sleeps in tests. The default real clock is replaced via
+// WithClock.
+func newWithClock(clk Clock) *Supervisor {
+	return NewWithOptions(WithClock(clk))
+}
+
+// newWithClockAndProbe builds a Supervisor with a custom clock plus
+// a fake MemoryPressureProbe. Used by TestSharedMemoryProbe.
+func newWithClockAndProbe(clk Clock, probe MemoryPressureProbe) *Supervisor {
+	return NewWithOptions(WithClock(clk), WithMemoryProbe(probe))
+}
+
 // fakeClock is a manual clock used in tests. Goroutines blocked on
 // After are released when the test advances the clock past their
 // trigger.
@@ -62,6 +75,23 @@ func (c *fakeClock) advance(d time.Duration) {
 		w.ch <- now
 		close(w.ch)
 	}
+}
+
+// waitForWaiters blocks until at least n waiters are registered on the
+// clock. Used by tests that need to advance the clock for a backoff
+// that has not yet been requested.
+func (c *fakeClock) waitForWaiters(t interface{ Fatalf(string, ...any) }, n int, timeout time.Duration) {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		c.mu.Lock()
+		got := len(c.waiters)
+		c.mu.Unlock()
+		if got >= n {
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	t.Fatalf("fakeClock: expected >=%d waiters within %v", n, timeout)
 }
 
 // fakeProbe is a manually-driven MemoryPressureProbe.

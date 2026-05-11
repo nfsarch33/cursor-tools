@@ -75,6 +75,7 @@ func TestRestartBackoff_ResetAfterHealthy(t *testing.T) {
 	// First crash.
 	waitForAtomic(t, &calls, 1, 2*time.Second)
 	gate <- errors.New("first crash")
+	clk.waitForWaiters(t, 1, 2*time.Second)
 	clk.advance(2 * time.Second)
 	waitForAtomic(t, &calls, 2, 2*time.Second)
 
@@ -84,6 +85,7 @@ func TestRestartBackoff_ResetAfterHealthy(t *testing.T) {
 
 	// Crash again -- backoff should reset to 1s.
 	gate <- errors.New("second crash after healthy")
+	clk.waitForWaiters(t, 1, 2*time.Second)
 	clk.advance(1 * time.Second)
 	waitForAtomic(t, &calls, 3, 2*time.Second)
 
@@ -222,6 +224,7 @@ func TestServiceHealthReporting(t *testing.T) {
 
 	// Inject a non-context error.
 	errCh <- errors.New("rdb sql crashed")
+	clk.waitForWaiters(t, 1, 2*time.Second)
 	clk.advance(2 * time.Second)
 	waitForAtomic(t, &calls, 2, 2*time.Second)
 
@@ -298,6 +301,17 @@ func TestSharedMemoryProbe(t *testing.T) {
 		_ = s.Run(ctx)
 	}()
 
+	// Wait for both services to have called Subscribe.
+	deadlineSub := time.Now().Add(2 * time.Second)
+	for time.Now().Before(deadlineSub) {
+		probe.mu.Lock()
+		n := len(probe.subscribers)
+		probe.mu.Unlock()
+		if n >= 2 {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 	// Probe broadcasts once.
 	probe.broadcast(MemoryPressure{When: clk.now, FreePct: 70, Level: "green"})
 
