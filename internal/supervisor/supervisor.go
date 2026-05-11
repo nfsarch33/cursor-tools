@@ -7,14 +7,6 @@ import (
 	"sync"
 )
 
-// Service is the interface that long-running daemon components implement.
-// Run blocks until ctx is cancelled or the service exits. The supervisor
-// recovers panics and logs service exits without tearing down siblings.
-type Service interface {
-	Name() string
-	Run(ctx context.Context) error
-}
-
 // Supervisor manages a set of services, running them concurrently with
 // independent panic recovery. When the parent context is cancelled, all
 // services are signalled to stop.
