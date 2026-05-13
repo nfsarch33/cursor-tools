@@ -96,8 +96,8 @@ func TestRenderHandoff_HeaderFields(t *testing.T) {
 func TestRenderHandoff_WithWorkspaceAndResourceSnapshot(t *testing.T) {
 	ctx := handoffRuntimeContext{
 		Workspace: handoffWorkspaceContext{
-			Path:      "/Users/jason.lian/runs/worktrees/ecommerce/feat-v9",
-			GitRoot:   "/Users/jason.lian/runs/worktrees/ecommerce/feat-v9",
+			Path:      "/tmp/runs/worktrees/ecommerce/feat-v9",
+			GitRoot:   "/tmp/runs/worktrees/ecommerce/feat-v9",
 			Branch:    "feat/v9",
 			RepoAlias: "ecommerce",
 			Mode:      "runx-managed worktree",
