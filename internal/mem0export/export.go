@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -73,6 +74,16 @@ func (e *Exporter) Export(w io.Writer) (int, error) {
 		}
 	}
 	return total, nil
+}
+
+// ExportToFile writes NDJSON to a file path (satisfies mem0backup.FileExporter).
+func (e *Exporter) ExportToFile(path string) (int, error) {
+	f, err := os.Create(path)
+	if err != nil {
+		return 0, fmt.Errorf("create file: %w", err)
+	}
+	defer f.Close()
+	return e.Export(f)
 }
 
 func (e *Exporter) fetchPage(page int) ([]Memory, error) {
