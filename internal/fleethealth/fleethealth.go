@@ -1,3 +1,5 @@
+// runx-public-repo-gate: allow-file network_topology — fleet health default endpoints include loopback addresses for local-stack probes
+
 package fleethealth
 
 import (

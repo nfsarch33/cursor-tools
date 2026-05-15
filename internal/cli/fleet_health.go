@@ -1,3 +1,5 @@
+// runx-public-repo-gate: allow-file fleet_host_alias,network_topology — fleet node definitions require real alias names for health checks
+
 package cli
 
 import (

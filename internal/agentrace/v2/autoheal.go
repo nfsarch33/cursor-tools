@@ -1,3 +1,5 @@
+// runx-public-repo-gate: allow-file secret_cred_ref — autoheal remediation templates reference SSH alias paths as example patterns, not live credentials
+
 package agentrace
 
 import (
