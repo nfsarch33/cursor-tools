@@ -10,7 +10,7 @@ import (
 
 const oneNodeJSON = `{
   "items": [{
-    "metadata": {"name": "wsl1", "labels": {"node-role.kubernetes.io/control-plane": ""}},
+    "metadata": {"name": "node-1", "labels": {"node-role.kubernetes.io/control-plane": ""}},
     "status": {
       "conditions": [{"type": "Ready", "status": "True"}],
       "capacity": {"nvidia.com/gpu": "3"},
@@ -22,7 +22,7 @@ const oneNodeJSON = `{
 const twoNodeJSON = `{
   "items": [
     {
-      "metadata": {"name": "wsl1", "labels": {"node-role.kubernetes.io/control-plane": ""}},
+      "metadata": {"name": "node-1", "labels": {"node-role.kubernetes.io/control-plane": ""}},
       "status": {
         "conditions": [{"type": "Ready", "status": "True"}],
         "capacity": {"nvidia.com/gpu": "3"},
@@ -30,7 +30,7 @@ const twoNodeJSON = `{
       }
     },
     {
-      "metadata": {"name": "wsl2", "labels": {}},
+      "metadata": {"name": "node-2", "labels": {}},
       "status": {
         "conditions": [{"type": "Ready", "status": "True"}],
         "capacity": {"nvidia.com/gpu": "1"},
@@ -42,7 +42,7 @@ const twoNodeJSON = `{
 
 const gpuSaturatedJSON = `{
   "items": [{
-    "metadata": {"name": "wsl1", "labels": {"node-role.kubernetes.io/control-plane": ""}},
+    "metadata": {"name": "node-1", "labels": {"node-role.kubernetes.io/control-plane": ""}},
     "status": {
       "conditions": [{"type": "Ready", "status": "True"}],
       "capacity": {"nvidia.com/gpu": "3"},
@@ -87,7 +87,7 @@ func TestParseNodes_SingleNode(t *testing.T) {
 	nodes, err := ParseNodesJSON([]byte(oneNodeJSON))
 	require.NoError(t, err)
 	require.Len(t, nodes, 1)
-	assert.Equal(t, "wsl1", nodes[0].Name)
+	assert.Equal(t, "node-1", nodes[0].Name)
 	assert.Equal(t, "Ready", nodes[0].Status)
 	assert.Equal(t, "control-plane", nodes[0].Roles)
 	assert.Equal(t, 3, nodes[0].GPUCount)
@@ -98,9 +98,9 @@ func TestParseNodes_TwoNodes(t *testing.T) {
 	nodes, err := ParseNodesJSON([]byte(twoNodeJSON))
 	require.NoError(t, err)
 	require.Len(t, nodes, 2)
-	assert.Equal(t, "wsl1", nodes[0].Name)
+	assert.Equal(t, "node-1", nodes[0].Name)
 	assert.Equal(t, 3, nodes[0].GPUCount)
-	assert.Equal(t, "wsl2", nodes[1].Name)
+	assert.Equal(t, "node-2", nodes[1].Name)
 	assert.Equal(t, 1, nodes[1].GPUCount)
 	assert.Equal(t, "worker", nodes[1].Roles)
 }
