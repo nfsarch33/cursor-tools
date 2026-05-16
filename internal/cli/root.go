@@ -66,6 +66,7 @@ func init() {
 	rootCmd.AddCommand(agentraceSearchCmd)
 	rootCmd.AddCommand(githubCmd)
 	rootCmd.AddCommand(rebrandCmd)
+	rootCmd.AddCommand(fleetCmd)
 }
 
 var versionCmd = &cobra.Command{
